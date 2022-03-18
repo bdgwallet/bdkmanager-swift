@@ -64,6 +64,7 @@ import BDKManager
 
 struct ContentView: View {
     @EnvironmentObject var bdkManager: BDKManager
+    
     var body: some View {
         Text("Hello, world!")
             .padding()
