@@ -46,7 +46,7 @@ public class BDGWalletBDK: ObservableObject {
     
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     
-    internal init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
+    public init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
         self.walletState = WalletState.initializing
         let databaseConfig = databaseConfig(database: database)
         let blockchainConfig = blockchainConfig(network: network, syncSource: syncSource)
@@ -156,7 +156,8 @@ public typealias Network = BitcoinDevKit.Network
 public struct SyncSource {
     public let type: SyncSourceType
     public let customUrl: String?
-    internal init(type: SyncSourceType, customUrl: String?) {
+    
+    public init(type: SyncSourceType, customUrl: String?) {
         self.type = type
         self.customUrl = customUrl
     }
@@ -171,7 +172,8 @@ public struct Database {
     public let type: DatabaseType
     public let path: String?
     public let treeName: String?
-    internal init(type: DatabaseType, path: String?, treeName: String?) {
+    
+    public init(type: DatabaseType, path: String?, treeName: String?) {
         self.type = type
         self.path = path
         self.treeName = treeName
