@@ -50,19 +50,19 @@ struct WalletApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WalletView()
                 .environmentObject(bdkManager)
         }
     }
 }
 ```
 
-**ContentView.swift**
+**WalletView.swift**
 ```swift
 import SwiftUI
 import BDKManager
 
-struct ContentView: View {
+struct WalletView: View {
     @EnvironmentObject var bdkManager: BDKManager
     
     var body: some View {
