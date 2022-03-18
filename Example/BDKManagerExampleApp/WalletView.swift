@@ -12,8 +12,10 @@ struct WalletView: View {
     @EnvironmentObject var bdkManager: BDKManager
     
     var body: some View {
-        Text("Hello, world!")
+        Text("Hello, wallet!")
             .padding()
+        Text("Generated address")
+        Text(bdkManager.wallet?.getNewAddress() ?? "-")
         switch bdkManager.syncState {
         case .synced:
             Text("Balance: \(bdkManager.balance)")
