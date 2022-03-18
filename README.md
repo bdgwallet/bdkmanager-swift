@@ -6,7 +6,7 @@ It is still a work in progress and not ready for production.
 
 ## Installation
 
-Add this github repository https://github.com/BDGWallet/bdgw-bdk-swift as a dependency in your Xcode project.   
+Add this github repository https://github.com/BDGWallet/bdkmanager-swift as a dependency in your Xcode project.   
 You can then import and use the `BDKManager` library in your Swift code.
 
 ```swift
