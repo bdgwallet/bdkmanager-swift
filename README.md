@@ -26,9 +26,9 @@ let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // 
 let bdkManager = BDKManager.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)     
 ```
 
-## Usage
+## Example
 
-Here's a basic but complete example of creating a SwiftUI app where the bdkManager is an @ObservedObject, which enables the ContentView to automatically update depending on the syncState:
+A working SwiftUI example app is included in the repo. It has very basic functionality of showing the balance for a descriptor address. In this case the bdkManager is an @ObservedObject, which enables the WalletView to automatically update depending on bdkManager.syncState. The two files required:
 
 **WalletApp.swift**
 ```swift
