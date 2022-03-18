@@ -147,11 +147,27 @@ public class BDKManager: ObservableObject {
             print("Error getting transactions: " + error.localizedDescription)
         }
     }
+
+    public func sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction? {
+        if self.wallet != nil {
+            do {
+                let psbt = try PartiallySignedBitcoinTransaction(wallet: self.wallet!, recipient: recipient, amount: amount, feeRate: nil)
+                try self.wallet!.sign(psbt: psbt)
+                return try self.wallet!.broadcast(psbt: psbt)
+                } catch let error {
+                    print(error)
+                    return nil
+            }
+        } else {
+            return nil
+        }
+    }
 }
 
 // Structs, Classes and enums
 
 public typealias Network = BitcoinDevKit.Network
+public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
 
 public struct SyncSource {
     public let type: SyncSourceType
