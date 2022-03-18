@@ -1,4 +1,4 @@
-# BDK Manager for iOS / Swift
+# BDKManager for iOS / Swift
 
 This package makes it easier to work with [bdk-swift](https://github.com/bitcoindevkit/bdk-swift) on iOS by providing good defaults, simple setup and modern SwiftUI compatible convenience methods and parameters.  
 
@@ -7,15 +7,15 @@ It is still a work in progress and not ready for production.
 ## Installation
 
 Add this github repository https://github.com/BDGWallet/bdgw-bdk-swift as a dependency in your Xcode project.   
-You can then import and use the `BDGWalletBDK` library in your Swift code.
+You can then import and use the `BDKManager` library in your Swift code.
 
 ```swift
-import BDGWalletBDK
+import BDKManager
 ```
 
 ## Setup
 
-To initalise a bdkManager with BDGWalletBDK and set up the basics:
+To initalise a BDKManager and set up the basics:
 
 ```swift
 let descriptor = "wpkh([c258d2e4/84h/1h/0h]tpubDDYkZojQFQjht8Tm4jsS3iuEmKjTiEGjG6KnuFNKKJb5A6ZUCUZKdvLdSDWofKi4ToRCwb9poe1XdqfUnP4jaJjCB2Zwv11ZLgSbnZSNecE/0/*)" // set descriptor from private key
@@ -23,7 +23,7 @@ let network = Network.testnet // bitcoin, testnet, signet or regtest
 let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // esplora or electrum, can take customUrl
 let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // memory or disk, optional path and tree parameters
         
-let bdkManager = BDGWalletBDK.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)     
+let bdkManager = BDKManager.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)     
 ```
 
 ## Usage
@@ -33,11 +33,11 @@ Here's a basic but complete example of creating a SwiftUI app where the bdkManag
 **WalletApp.swift**
 ```swift
 import SwiftUI
-import BDGWalletBDK
+import BDKManager
 
 @main
 struct WalletApp: App {
-    @ObservedObject var bdkManager: BDGWalletBDK
+    @ObservedObject var bdkManager: BDKManager
     
     init() {
         let descriptor = "wpkh([c258d2e4/84h/1h/0h]tpubDDYkZojQFQjht8Tm4jsS3iuEmKjTiEGjG6KnuFNKKJb5A6ZUCUZKdvLdSDWofKi4ToRCwb9poe1XdqfUnP4jaJjCB2Zwv11ZLgSbnZSNecE/0/*)"
@@ -45,7 +45,7 @@ struct WalletApp: App {
         let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil)
         let database = Database(type: DatabaseType.memory, path: nil, treeName: nil)
         
-        bdkManager = BDGWalletBDK.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)
+        bdkManager = BDKManager.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)
     }
     
     var body: some Scene {
@@ -60,10 +60,10 @@ struct WalletApp: App {
 **ContentView.swift**
 ```swift
 import SwiftUI
-import BDGWalletBDK
+import BDKManager
 
 struct ContentView: View {
-    @EnvironmentObject var bdkManager: BDGWalletBDK
+    @EnvironmentObject var bdkManager: BDKManager
     var body: some View {
         Text("Hello, world!")
             .padding()
