@@ -151,9 +151,11 @@ public class BDGWalletBDK: ObservableObject {
 
 // Structs, Classes and enums
 
+public typealias Network = BitcoinDevKit.Network
+
 public struct SyncSource {
-    let type: SyncSourceType
-    let customUrl: String?
+    public let type: SyncSourceType
+    public let customUrl: String?
 }
 
 public enum SyncSourceType {
@@ -162,9 +164,9 @@ public enum SyncSourceType {
 }
 
 public struct Database {
-    let type: DatabaseType
-    let path: String?
-    let treeName: String?
+    public let type: DatabaseType
+    public let path: String?
+    public let treeName: String?
 }
 
 public enum DatabaseType {
