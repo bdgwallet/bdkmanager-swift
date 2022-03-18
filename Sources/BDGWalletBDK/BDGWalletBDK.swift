@@ -185,26 +185,26 @@ public enum DatabaseType {
     case disk
 }
 
-class Progress : BdkProgress {
-    var value = Float()
-    func update(progress: Float, message: String?) {
-        value = progress
-        print("progress", progress, message as Any)
-    }
-}
-
-enum SyncState {
+public enum SyncState {
     case empty
     case syncing
     case synced
     case failed(Error)
 }
 
-enum WalletState {
+public enum WalletState {
     case empty
     case initializing
     case initialized(Wallet)
     case failed(Error)
+}
+
+class Progress : BdkProgress {
+    var value = Float()
+    func update(progress: Float, message: String?) {
+        value = progress
+        print("progress", progress, message as Any)
+    }
 }
 
 // Defeault public api URLs
