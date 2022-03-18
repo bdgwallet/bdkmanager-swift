@@ -8,10 +8,10 @@ import Foundation
 import BitcoinDevKit
 
 public class BDGWalletBDK: ObservableObject {
-    @Published var wallet: Wallet?
-    @Published var balance: UInt64 = 0
-    @Published var transactions: [BitcoinDevKit.Transaction] = []
-    @Published var walletState = WalletState.empty {
+    @Published public var wallet: Wallet?
+    @Published public var balance: UInt64 = 0
+    @Published public var transactions: [BitcoinDevKit.Transaction] = []
+    @Published public var walletState = WalletState.empty {
         didSet {
             switch walletState {
             case .empty:
@@ -27,7 +27,7 @@ public class BDGWalletBDK: ObservableObject {
             }
         }
     }
-    @Published var syncState = SyncState.empty {
+    @Published public var syncState = SyncState.empty {
         didSet {
             switch syncState {
             case .empty:
