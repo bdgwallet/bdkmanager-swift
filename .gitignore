@@ -19,6 +19,12 @@ xcuserdata/
 xcuserdata/
 DerivedData/
 .swiftpm
+/Example/.DS_Store
+/Example/BDKManagerExampleApp/.DS_Store
+/Example/BDKManagerExampleApp/Assets.xcassets/.DS_Store
+/Example/BDKManagerExampleApp.xcodeproj/project.pbxproj
+/Example/BDKManagerExampleApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+/Example/BDKManagerExampleApp.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
 
 ## Package ##
 Package.resolved
