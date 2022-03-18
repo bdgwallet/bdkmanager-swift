@@ -7,7 +7,7 @@
 import Foundation
 import BitcoinDevKit
 
-public class BDGWalletBDK: ObservableObject {
+public class BDKManager: ObservableObject {
     @Published public var wallet: Wallet?
     @Published public var balance: UInt64 = 0
     @Published public var transactions: [BitcoinDevKit.Transaction] = []
