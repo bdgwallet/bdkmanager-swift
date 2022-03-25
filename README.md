@@ -19,11 +19,24 @@ To initalise a BDKManager and set up the basics:
 
 ```swift
 let descriptor = "wpkh([c258d2e4/84h/1h/0h]tpubDDYkZojQFQjht8Tm4jsS3iuEmKjTiEGjG6KnuFNKKJb5A6ZUCUZKdvLdSDWofKi4ToRCwb9poe1XdqfUnP4jaJjCB2Zwv11ZLgSbnZSNecE/0/*)" // set descriptor from private key
+
 let network = Network.testnet // bitcoin, testnet, signet or regtest
 let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // esplora or electrum, can take customUrl
 let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // memory or disk, optional path and tree parameters
         
 let bdkManager = BDKManager.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)     
+```
+
+## Syncing
+
+The wallet can either be synced manually by calling `sync()`, or at regular intervals by using `startSyncRegularly` and `stopSyncRegularly`.
+On every sync, the @Published parameters `.balance` and `.transactions` are updated, which means they automatically trigger updates in SwiftUI.
+
+```swift
+bdkManager.sync() // Will sync once
+
+bdkManager.startSyncRegularly(interval: 120) // Will sync every 120 seconds
+bdkManager.stopSyncRegularly() // Will stop the regular sync
 ```
 
 ## Example
