@@ -21,7 +21,6 @@ public class BDKManager: ObservableObject {
             case .initialized(let wallet):
                 print("Wallet is initialized")
                 self.wallet = wallet
-                self.sync()
             case .failed(let error):
                 print("Error initializing wallet:" + error.localizedDescription)
             }
@@ -45,6 +44,7 @@ public class BDKManager: ObservableObject {
     }
     
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
+    private var syncTimer: Timer?
     
     public init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
         self.walletState = WalletState.initializing
@@ -113,6 +113,16 @@ public class BDKManager: ObservableObject {
         default:
             print("Could not sync, wallet not initialized")
         }
+    }
+    
+    public func startSyncRegularly(interval: TimeInterval) {
+        self.syncTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true){ tempTimer in
+            self.sync()
+        }
+    }
+    
+    public func stopSyncRegularly() {
+        self.syncTimer?.invalidate()
     }
     
     private func getBalance() {
