@@ -116,6 +116,7 @@ public class BDKManager: ObservableObject {
     }
     
     public func startSyncRegularly(interval: TimeInterval) {
+        self.sync()
         self.syncTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true){ tempTimer in
             self.sync()
         }
