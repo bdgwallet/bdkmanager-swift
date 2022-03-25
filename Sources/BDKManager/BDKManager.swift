@@ -43,6 +43,9 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    private var network: Network
+    private var syncSource: SyncSource
+    private var database: Database
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     private var syncTimer: Timer?
     
@@ -64,10 +67,16 @@ public class BDKManager: ObservableObject {
     }
     
     public init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
+        self.network = network
+        self.syncSource = syncSource
+        self.database = database
+    }
+    
+    public func loadWallet(descriptor: String) {
         self.walletState = WalletState.initializing
-        let databaseConfig = databaseConfig(database: database)
-        let blockchainConfig = blockchainConfig(network: network, syncSource: syncSource)
-        initializeWallet(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
+        let databaseConfig = databaseConfig(database: self.database)
+        let blockchainConfig = blockchainConfig(network: self.network, syncSource: self.syncSource)
+        initializeWallet(descriptor: descriptor, changeDescriptor: nil, network: self.network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
     }
     
     private func blockchainConfig(network: Network, syncSource: SyncSource) -> BlockchainConfig {
