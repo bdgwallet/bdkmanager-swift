@@ -87,7 +87,6 @@ public class BDKManager: ObservableObject {
     private func initializeWallet(descriptor: String, changeDescriptor: String?, network: Network, databaseConfig: DatabaseConfig, blockchainConfig: BlockchainConfig) {
         do {
             let wallet = try Wallet.init(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
-            self.wallet = wallet
             self.walletState = WalletState.initialized(wallet)
         } catch let error {
             self.walletState = WalletState.failed(error)
