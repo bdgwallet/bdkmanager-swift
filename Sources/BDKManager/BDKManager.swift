@@ -49,9 +49,9 @@ public class BDKManager: ObservableObject {
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     private var syncTimer: Timer?
     
-    public func generateExtendedKey(network: Network, wordCount: WordCount, password: String?) -> ExtendedKeyInfo? {
+    public func generateExtendedKey(wordCount: WordCount, password: String?) -> ExtendedKeyInfo? {
         do {
-            let extendedKeyInfo = try BitcoinDevKit.generateExtendedKey(network: network, wordCount: wordCount, password: password)
+            let extendedKeyInfo = try BitcoinDevKit.generateExtendedKey(network: self.network, wordCount: wordCount, password: password)
             return extendedKeyInfo
         } catch let error {
             print(error)
