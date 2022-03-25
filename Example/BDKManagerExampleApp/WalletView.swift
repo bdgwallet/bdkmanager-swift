@@ -24,7 +24,10 @@ struct WalletView: View {
             }
             Text(bdkManager.wallet?.getNewAddress() ?? "-")
         }.onAppear {
-            bdkManager.sync()
+            bdkManager.sync() // to sync once
+            //bdkManager.startSyncRegularly(interval: 120) // to sync every 120 seconds
+        }.onDisappear {
+            //bdkManager.stopSyncRegularly() // if startSyncRegularly was used
         }
     }
 }
