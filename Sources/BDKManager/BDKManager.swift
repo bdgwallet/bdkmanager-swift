@@ -66,7 +66,7 @@ public class BDKManager: ObservableObject {
         }
     }
     
-    public init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
+    public init(network: Network, syncSource: SyncSource, database: Database) {
         self.network = network
         self.syncSource = syncSource
         self.database = database
