@@ -87,6 +87,7 @@ public class BDKManager: ObservableObject {
     private func initializeWallet(descriptor: String, changeDescriptor: String?, network: Network, databaseConfig: DatabaseConfig, blockchainConfig: BlockchainConfig) {
         do {
             let wallet = try Wallet.init(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
+            self.wallet = wallet
             self.walletState = WalletState.initialized(wallet)
         } catch let error {
             self.walletState = WalletState.failed(error)
@@ -162,7 +163,7 @@ public class BDKManager: ObservableObject {
     public func sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction? {
         if self.wallet != nil {
             do {
-                let psbt = try PartiallySignedBitcoinTransaction(wallet: self.wallet!, recipient: recipient, amount: amount, feeRate: nil)
+                let psbt = try PartiallySignedBitcoinTransaction(wallet: self.wallet!, recipient: recipient, amount: amount, feeRate: feeRate)
                 try self.wallet!.sign(psbt: psbt)
                 return try self.wallet!.broadcast(psbt: psbt)
                 } catch let error {
