@@ -18,13 +18,33 @@ import BDKManager
 To initalise a BDKManager and set up the basics:
 
 ```swift
-let descriptor = "wpkh([c258d2e4/84h/1h/0h]tpubDDYkZojQFQjht8Tm4jsS3iuEmKjTiEGjG6KnuFNKKJb5A6ZUCUZKdvLdSDWofKi4ToRCwb9poe1XdqfUnP4jaJjCB2Zwv11ZLgSbnZSNecE/0/*)" // set descriptor from private key
-
-let network = Network.testnet // bitcoin, testnet, signet or regtest
-let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // esplora or electrum, can take customUrl
-let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // memory or disk, optional path and tree parameters
+let network = Network.testnet // set bitcoin, testnet, signet or regtest
+let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // set esplora or electrum, can take customUrl
+let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // set memory or disk, optional path and tree parameters
         
-let bdkManager = BDKManager.init(descriptor: descriptor, network: network, syncSource: syncSource, database: database)     
+bdkManager = BDKManager.init(network: network, syncSource: syncSource, database: database)   
+```
+
+## Load wallet
+
+To create a new extended private key, descriptor and load the wallet:
+
+```swift
+do {
+    let wordCount = WordCount.words12 // 12, 24
+    let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil)
+    let descriptor = bdkManager.createDescriptor(descriptorType: DescriptorType.singleKey_wpkh84, extendedKeyInfo: extendedKeyInfo)
+    bdkManager.loadWallet(descriptor: descriptor)
+} catch let error {
+    print(error)
+}  
+```
+
+To load  wallet from an existing descriptor:
+
+```swift
+let descriptor = "wpkh(tprv8ZgxMBicQKsPeSitUfdxhsVaf4BXAASVAbHypn2jnPcjmQZvqZYkeqx7EHQTWvdubTSDa5ben7zHC7sUsx4d8tbTvWdUtHzR8uhHg2CW7MT/*)"
+bdkManager.loadWallet(descriptor: descriptor) 
 ```
 
 ## Syncing
