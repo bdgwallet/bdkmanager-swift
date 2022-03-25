@@ -47,7 +47,7 @@ let descriptor = "wpkh(tprv8ZgxMBicQKsPeSitUfdxhsVaf4BXAASVAbHypn2jnPcjmQZvqZYke
 bdkManager.loadWallet(descriptor: descriptor) 
 ```
 
-## Syncing
+## Sync
 
 The wallet can either be synced manually by calling `sync()`, or at regular intervals by using `startSyncRegularly` and `stopSyncRegularly`.
 On every sync, the @Published parameters `.balance` and `.transactions` are updated, which means they automatically trigger updates in SwiftUI.
