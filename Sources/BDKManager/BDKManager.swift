@@ -46,6 +46,23 @@ public class BDKManager: ObservableObject {
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     private var syncTimer: Timer?
     
+    public func generateExtendedKey(network: Network, wordCount: WordCount, password: String?) -> ExtendedKeyInfo? {
+        do {
+            let extendedKeyInfo = try BitcoinDevKit.generateExtendedKey(network: network, wordCount: wordCount, password: password)
+            return extendedKeyInfo
+        } catch let error {
+            print(error)
+            return nil
+        }
+    }
+    
+    public func createDescriptor(descriptorType: DescriptorType, extendedKeyInfo: ExtendedKeyInfo) -> String {
+        switch descriptorType {
+        case .singleKey_wpkh84:
+            return ("wpkh(" + extendedKeyInfo.xprv + "/84'/1'/0'/0/*)")
+        }
+    }
+    
     public init(descriptor: String, network: Network, syncSource: SyncSource, database: Database) {
         self.walletState = WalletState.initializing
         let databaseConfig = databaseConfig(database: database)
@@ -178,9 +195,14 @@ public class BDKManager: ObservableObject {
 // Structs, Classes and enums
 
 public typealias Network = BitcoinDevKit.Network
+public typealias WordCount = BitcoinDevKit.WordCount
 public typealias Transaction = BitcoinDevKit.Transaction
 public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
+
+public enum DescriptorType {
+    case singleKey_wpkh84
+}
 
 public struct SyncSource {
     public let type: SyncSourceType
