@@ -178,6 +178,8 @@ public class BDKManager: ObservableObject {
 // Structs, Classes and enums
 
 public typealias Network = BitcoinDevKit.Network
+public typealias Transaction = BitcoinDevKit.Transaction
+public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
 
 public struct SyncSource {
