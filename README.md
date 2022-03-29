@@ -15,12 +15,12 @@ import BDKManager
 
 ## Setup
 
-To initalise a BDKManager and set up the basics:
+To initalise a BDKManager you need to tell it what bitcoin `Network` it should use, what `SyncSource` the wallet is going to connect to for blockchain data, and where the `Database` should store information. The two supported sync source types by BDK on iOS at the moment is Esplora and Electrum API servers. You can specify a custom URL to a private server, or if none is supplied it will default to the public Blockstream APIs.
 
 ```swift
-let network = Network.testnet // set bitcoin, testnet, signet or regtest
-let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // set esplora or electrum, can take customUrl
-let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // set memory or disk, optional path and tree parameters
+let network = Network.testnet // .bitcoin, .testnet, .signet or .regtest
+let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // .esplora or .electrum, optional customUrl
+let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // .memory or .disk, optional path and tree parameters
         
 bdkManager = BDKManager.init(network: network, syncSource: syncSource, database: database)   
 ```
@@ -31,8 +31,9 @@ To create a new extended private key, descriptor and load the wallet:
 
 ```swift
 do {
-    let wordCount = WordCount.words12 // 12, 24
-    let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil)
+    let wordCount = WordCount.words12 // .words12, or .words24
+    let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil) // optional password
+    let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 is the only type defined so far
     let descriptor = bdkManager.createDescriptor(descriptorType: DescriptorType.singleKey_wpkh84, extendedKeyInfo: extendedKeyInfo)
     bdkManager.loadWallet(descriptor: descriptor)
 } catch let error {
