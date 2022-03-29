@@ -1,4 +1,4 @@
-# BDKManager for iOS / Swift
+# BDK Manager for iOS / Swift
 
 This package makes it easier to work with [bdk-swift](https://github.com/bitcoindevkit/bdk-swift) on iOS by providing good defaults, simple setup and modern SwiftUI compatible convenience methods and parameters.  
 
