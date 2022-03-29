@@ -34,7 +34,7 @@ do {
     let wordCount = WordCount.words12 // .words12, or .words24
     let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil) // optional password
     let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 is the only type defined so far
-    let descriptor = bdkManager.createDescriptor(descriptorType: DescriptorType.singleKey_wpkh84, extendedKeyInfo: extendedKeyInfo)
+    let descriptor = bdkManager.createDescriptor(descriptorType: descriptorType, extendedKeyInfo: extendedKeyInfo)
     bdkManager.loadWallet(descriptor: descriptor)
 } catch let error {
     print(error)
@@ -148,6 +148,17 @@ sync()
 startSyncRegularly(interval: TimeInterval)
 stopSyncRegularly()
 sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction?
+```
+
+Since the wallet is a BDK Wallet, the corresponding functions are also available on .wallet:
+```swift
+getNewAddress()  -> String
+getLastUnusedAddress()  -> String
+getBalance() throws -> UInt64
+sign( psbt: PartiallySignedBitcoinTransaction ) throws
+getTransactions() throws -> [Transaction]
+getNetwork()  -> Network
+broadcast( psbt: PartiallySignedBitcoinTransaction ) throws -> Transaction
 ```
 
 ## Public variables
