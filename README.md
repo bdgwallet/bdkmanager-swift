@@ -134,3 +134,31 @@ struct WalletView: View {
     }
 }
 ```
+
+## Public functions
+
+BDK Manager has the following public functions:
+```
+generateExtendedKey(wordCount: WordCount, password: String?) throws -> ExtendedKeyInfo
+createDescriptor(descriptorType: DescriptorType, extendedKeyInfo: ExtendedKeyInfo) -> String
+
+init(network: Network, syncSource: SyncSource, database: Database)
+loadWallet(descriptor: String)
+
+sync()
+startSyncRegularly(interval: TimeInterval)
+stopSyncRegularly()
+
+sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction?
+```
+
+## Public variables
+
+BDK Manager has the following `@Published` public variables, meaning they can be observed and lead to updates in SwiftUI:
+```
+.wallet: Wallet?
+.balance: UInt64
+.transactions: [BitcoinDevKit.Transaction]
+.walletState // .empty, .loading, .loaded, .failed
+.syncState // .empty, .syncing, .synced, .failed
+```
