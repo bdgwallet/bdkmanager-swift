@@ -8,6 +8,7 @@ import Foundation
 import BitcoinDevKit
 
 public class BDKManager: ObservableObject {
+    //Public variables
     @Published public var wallet: Wallet?
     @Published public var balance: UInt64 = 0
     @Published public var transactions: [BitcoinDevKit.Transaction] = []
@@ -43,12 +44,15 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Private variables
     private var network: Network
     private var syncSource: SyncSource
     private var database: Database
     private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     private var syncTimer: Timer?
     
+    // Public functions
+    // Generate an extended key
     public func generateExtendedKey(wordCount: WordCount, password: String?) throws -> ExtendedKeyInfo {
         do {
             let extendedKeyInfo = try BitcoinDevKit.generateExtendedKey(network: self.network, wordCount: wordCount, password: password)
@@ -58,6 +62,7 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Create a descriptor from an extended key, .singleKey_wpkh84 is the only type currently defined
     public func createDescriptor(descriptorType: DescriptorType, extendedKeyInfo: ExtendedKeyInfo) -> String {
         switch descriptorType {
         case .singleKey_wpkh84:
@@ -65,12 +70,14 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Initialize a BDKManager instance
     public init(network: Network, syncSource: SyncSource, database: Database) {
         self.network = network
         self.syncSource = syncSource
         self.database = database
     }
     
+    // Load a wallet from a descriptor
     public func loadWallet(descriptor: String) {
         self.walletState = WalletState.loading
         let databaseConfig = databaseConfig(database: self.database)
@@ -78,46 +85,7 @@ public class BDKManager: ObservableObject {
         initializeWallet(descriptor: descriptor, changeDescriptor: nil, network: self.network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
     }
     
-    private func blockchainConfig(network: Network, syncSource: SyncSource) -> BlockchainConfig {
-        var blockchainConfig: BlockchainConfig
-        switch syncSource.type {
-        case .esplora:
-            let defaultUrl = network == Network.bitcoin ? ESPLORA_URL_BITCOIN : ESPLORA_URL_TESTNET
-            let url = syncSource.customUrl != nil ? syncSource.customUrl : defaultUrl
-            let esploraConfig = EsploraConfig.init(baseUrl: url!, proxy: nil, timeoutRead: 1000, timeoutWrite: 1000, stopGap: 20)
-            blockchainConfig = BlockchainConfig.esplora(config: esploraConfig)
-        case .electrum:
-            let defaultUrl = network == Network.bitcoin ? ELECTRUM_URL_BITCOIN : ELECTRUM_URL_TESTNET
-            let url = syncSource.customUrl != nil ? syncSource.customUrl : defaultUrl
-            let electrumConfig = ElectrumConfig(url: url!, socks5: nil, retry: 5, timeout: nil, stopGap: 10)
-            blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
-        }
-        return blockchainConfig
-    }
-    
-    private func databaseConfig(database: Database) -> DatabaseConfig {
-        var databaseConfig: DatabaseConfig
-        switch database.type {
-        case .memory:
-            databaseConfig = DatabaseConfig.memory(junk: "")
-        case .disk:
-            let path = database.path != nil ? database.path : ""
-            let treeName = database.treeName != nil ? database.treeName : ""
-            let sledDbConfig = SledDbConfiguration(path: path!, treeName: treeName!)
-            databaseConfig = DatabaseConfig.sled(config: sledDbConfig)
-        }
-        return databaseConfig
-    }
-    
-    private func initializeWallet(descriptor: String, changeDescriptor: String?, network: Network, databaseConfig: DatabaseConfig, blockchainConfig: BlockchainConfig) {
-        do {
-            let wallet = try Wallet.init(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
-            self.walletState = WalletState.loaded(wallet)
-        } catch let error {
-            self.walletState = WalletState.failed(error)
-        }
-    }
-    
+    // Sync the loaded wallet once
     public func sync() {
         switch self.walletState {
         case .loaded(let wallet):
@@ -140,6 +108,7 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Sync the loaded wallet immediately, and then at the specified regular interval
     public func startSyncRegularly(interval: TimeInterval) {
         self.sync()
         self.syncTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true){ tempTimer in
@@ -147,10 +116,72 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Stop regular sync of the loaded wallet
     public func stopSyncRegularly() {
         self.syncTimer?.invalidate()
     }
     
+    // Send an amount of bitcoin (in sats) to a recipient, optional feeRate
+    public func sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction? {
+        if self.wallet != nil {
+            do {
+                let psbt = try PartiallySignedBitcoinTransaction(wallet: self.wallet!, recipient: recipient, amount: amount, feeRate: feeRate)
+                try self.wallet!.sign(psbt: psbt)
+                return try self.wallet!.broadcast(psbt: psbt)
+                } catch let error {
+                    print(error)
+                    return nil
+            }
+        } else {
+            return nil
+        }
+    }
+    
+    // Private functions
+    // Create a BDK BlockchainConfig based on a SyncSource (.esplora or .electrum)
+    private func blockchainConfig(network: Network, syncSource: SyncSource) -> BlockchainConfig {
+        var blockchainConfig: BlockchainConfig
+        switch syncSource.type {
+        case .esplora:
+            let defaultUrl = network == Network.bitcoin ? ESPLORA_URL_BITCOIN : ESPLORA_URL_TESTNET
+            let url = syncSource.customUrl != nil ? syncSource.customUrl : defaultUrl
+            let esploraConfig = EsploraConfig.init(baseUrl: url!, proxy: nil, timeoutRead: ESPLORA_TIMEOUT_READ, timeoutWrite: ESPLORA_TIMEOUT_WRITE, stopGap: ESPLORA_STOPGAP)
+            blockchainConfig = BlockchainConfig.esplora(config: esploraConfig)
+        case .electrum:
+            let defaultUrl = network == Network.bitcoin ? ELECTRUM_URL_BITCOIN : ELECTRUM_URL_TESTNET
+            let url = syncSource.customUrl != nil ? syncSource.customUrl : defaultUrl
+            let electrumConfig = ElectrumConfig(url: url!, socks5: nil, retry: ELECTRUM_RETRY, timeout: nil, stopGap: ELECTRUM_STOPGAP)
+            blockchainConfig = BlockchainConfig.electrum(config: electrumConfig)
+        }
+        return blockchainConfig
+    }
+    
+    // Create a BDK DatabaseConfig based on a Database (.memory or .disk)
+    private func databaseConfig(database: Database) -> DatabaseConfig {
+        var databaseConfig: DatabaseConfig
+        switch database.type {
+        case .memory:
+            databaseConfig = DatabaseConfig.memory(junk: "")
+        case .disk:
+            let path = database.path != nil ? database.path : ""
+            let treeName = database.treeName != nil ? database.treeName : ""
+            let sledDbConfig = SledDbConfiguration(path: path!, treeName: treeName!)
+            databaseConfig = DatabaseConfig.sled(config: sledDbConfig)
+        }
+        return databaseConfig
+    }
+    
+    // Initialize a BDK Wallet based on Descriptor, Network, DatabaseConfig and BlockchainConfig
+    private func initializeWallet(descriptor: String, changeDescriptor: String?, network: Network, databaseConfig: DatabaseConfig, blockchainConfig: BlockchainConfig) {
+        do {
+            let wallet = try Wallet.init(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
+            self.walletState = WalletState.loaded(wallet)
+        } catch let error {
+            self.walletState = WalletState.failed(error)
+        }
+    }
+    
+    // Update .balance
     private func getBalance() {
         do {
             self.balance = try self.wallet!.getBalance()
@@ -160,6 +191,7 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Update .transactions
     private func getTransactions() {
         do {
             let transactions = try self.wallet!.getTransactions()
@@ -183,25 +215,9 @@ public class BDKManager: ObservableObject {
             print("Error getting transactions: " + error.localizedDescription)
         }
     }
-
-    public func sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction? {
-        if self.wallet != nil {
-            do {
-                let psbt = try PartiallySignedBitcoinTransaction(wallet: self.wallet!, recipient: recipient, amount: amount, feeRate: feeRate)
-                try self.wallet!.sign(psbt: psbt)
-                return try self.wallet!.broadcast(psbt: psbt)
-                } catch let error {
-                    print(error)
-                    return nil
-            }
-        } else {
-            return nil
-        }
-    }
 }
 
-// Structs, Classes and enums
-
+// Helpers
 public typealias Network = BitcoinDevKit.Network
 public typealias WordCount = BitcoinDevKit.WordCount
 public typealias Transaction = BitcoinDevKit.Transaction
@@ -266,11 +282,17 @@ class Progress : BdkProgress {
     }
 }
 
-// Defeault public api URLs
-
+// Public API URLs
 let ESPLORA_URL_BITCOIN = "https://blockstream.info/api/"
 let ESPLORA_URL_TESTNET = "https://blockstream.info/testnet/api"
 
 let ELECTRUM_URL_BITCOIN = "ssl://electrum.blockstream.info:60001"
 let ELECTRUM_URL_TESTNET = "ssl://electrum.blockstream.info:60002"
 
+// Defaults
+let ESPLORA_TIMEOUT_READ = UInt64(1000)
+let ESPLORA_TIMEOUT_WRITE = UInt64(1000)
+let ESPLORA_STOPGAP = UInt64(20)
+
+let ELECTRUM_RETRY = UInt8(5)
+let ELECTRUM_STOPGAP = UInt64(10)
