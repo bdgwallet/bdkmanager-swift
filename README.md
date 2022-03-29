@@ -15,7 +15,7 @@ import BDKManager
 
 ## Setup
 
-To initalise a BDKManager you need to tell it what bitcoin `Network` it should use, what `SyncSource` the wallet is going to connect to for blockchain data, and where the `Database` should store information. The two supported sync source types by BDK on iOS at the moment is Esplora and Electrum API servers. You can specify a custom URL to a private server, or if none is supplied it will default to the public Blockstream APIs.
+To initalise a BDKManager you need to tell it what bitcoin `Network` it should use, what `SyncSource` the wallet is going to connect to for blockchain data, and where the `Database` should store information. The two supported sync source types by BDK on iOS at the moment is Esplora and Electrum API servers. You can specify a custom URL to a private server, or if none is supplied it will default to the public [Blockstream APIs](https://github.com/Blockstream/esplora/blob/master/API.md).
 
 ```swift
 let network = Network.testnet // .bitcoin, .testnet, .signet or .regtest
