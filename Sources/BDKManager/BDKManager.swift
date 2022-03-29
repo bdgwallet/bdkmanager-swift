@@ -16,9 +16,9 @@ public class BDKManager: ObservableObject {
             switch walletState {
             case .empty:
                 print("Wallet is not initialized")
-            case .initializing:
+            case .loading:
                 print("Wallet is initializing")
-            case .initialized(let wallet):
+            case .loaded(let wallet):
                 print("Wallet is initialized")
                 self.wallet = wallet
             case .failed(let error):
@@ -72,7 +72,7 @@ public class BDKManager: ObservableObject {
     }
     
     public func loadWallet(descriptor: String) {
-        self.walletState = WalletState.initializing
+        self.walletState = WalletState.loading
         let databaseConfig = databaseConfig(database: self.database)
         let blockchainConfig = blockchainConfig(network: self.network, syncSource: self.syncSource)
         initializeWallet(descriptor: descriptor, changeDescriptor: nil, network: self.network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
@@ -112,7 +112,7 @@ public class BDKManager: ObservableObject {
     private func initializeWallet(descriptor: String, changeDescriptor: String?, network: Network, databaseConfig: DatabaseConfig, blockchainConfig: BlockchainConfig) {
         do {
             let wallet = try Wallet.init(descriptor: descriptor, changeDescriptor: nil, network: network, databaseConfig: databaseConfig, blockchainConfig: blockchainConfig)
-            self.walletState = WalletState.initialized(wallet)
+            self.walletState = WalletState.loaded(wallet)
         } catch let error {
             self.walletState = WalletState.failed(error)
         }
@@ -120,7 +120,7 @@ public class BDKManager: ObservableObject {
     
     public func sync() {
         switch self.walletState {
-        case .initialized(let wallet):
+        case .loaded(let wallet):
             self.syncState = SyncState.syncing
             bdkQueue.async {
                 do {
@@ -253,8 +253,8 @@ public enum SyncState {
 
 public enum WalletState {
     case empty
-    case initializing
-    case initialized(Wallet)
+    case loading
+    case loaded(Wallet)
     case failed(Error)
 }
 
