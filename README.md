@@ -1,12 +1,12 @@
 # BDK Manager for iOS / Swift
 
-This package makes it easier to work with [bdk-swift](https://github.com/bitcoindevkit/bdk-swift) on iOS by providing good defaults, simple setup and modern SwiftUI compatible convenience methods and parameters.  
+This package makes it easier to work with [bdk-swift](https://github.com/bitcoindevkit/bdk-swift) on iOS by providing good defaults, simple setup and modern SwiftUI compatible convenience functions and variables.  
 
 It is still a work in progress and not ready for production.
 
 ## Installation
 
-Add this github repository https://github.com/BDGWallet/bdkmanager-swift as a dependency in your Xcode project.   
+Add this github repository https://github.com/bdgwallet/bdkmanager-swift as a dependency in your Xcode project.   
 You can then import and use the `BDKManager` library in your Swift code.
 
 ```swift
