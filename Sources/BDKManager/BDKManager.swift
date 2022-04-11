@@ -8,7 +8,7 @@ import Foundation
 import BitcoinDevKit
 
 public class BDKManager: ObservableObject {
-    //Public variables
+    // Public variables
     @Published public var wallet: Wallet?
     @Published public var balance: UInt64 = 0
     @Published public var transactions: [BitcoinDevKit.Transaction] = []
