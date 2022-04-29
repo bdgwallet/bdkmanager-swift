@@ -223,6 +223,7 @@ public typealias WordCount = BitcoinDevKit.WordCount
 public typealias Transaction = BitcoinDevKit.Transaction
 public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
+public typealias Progress = BitcoinDevKit.Progress
 
 public enum DescriptorType {
     case singleKey_wpkh84
@@ -272,14 +273,6 @@ public enum WalletState {
     case loading
     case loaded(Wallet)
     case failed(Error)
-}
-
-class Progress : BdkProgress {
-    var value = Float()
-    func update(progress: Float, message: String?) {
-        value = progress
-        print("progress", progress, message as Any)
-    }
 }
 
 // Public API URLs
