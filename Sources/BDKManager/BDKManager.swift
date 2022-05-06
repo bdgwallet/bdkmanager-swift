@@ -53,10 +53,9 @@ public class BDKManager: ObservableObject {
     
     // Public functions
     // Generate an extended key
-    public func generateExtendedKey(wordCount: WordCount, password: String?) throws -> ExtendedKeyInfo {
+    public func generateExtendedKey(wordCount: WordCount?, password: String?) throws -> ExtendedKeyInfo {
         do {
-            let extendedKeyInfo = try BitcoinDevKit.generateExtendedKey(network: self.network, wordCount: wordCount, password: password)
-            return extendedKeyInfo
+            return try BitcoinDevKit.generateExtendedKey(network: self.network, wordCount: wordCount != nil ? wordCount! : WordCount.words12, password: password)
         } catch let error {
             throw error
         }
@@ -218,12 +217,13 @@ public class BDKManager: ObservableObject {
 }
 
 // Helpers
+public typealias ExtendedKeyInfo = BitcoinDevKit.ExtendedKeyInfo
 public typealias Network = BitcoinDevKit.Network
-public typealias WordCount = BitcoinDevKit.WordCount
-public typealias Transaction = BitcoinDevKit.Transaction
-public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
 public typealias Progress = BitcoinDevKit.Progress
+public typealias Transaction = BitcoinDevKit.Transaction
+public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
+public typealias WordCount = BitcoinDevKit.WordCount
 
 public enum DescriptorType {
     case singleKey_wpkh84
