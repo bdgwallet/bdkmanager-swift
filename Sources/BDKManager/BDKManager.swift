@@ -7,6 +7,7 @@
 import Foundation
 import BitcoinDevKit
 
+@MainActor
 public class BDKManager: ObservableObject {
     // Public variables
     @Published public var wallet: Wallet?
@@ -48,7 +49,6 @@ public class BDKManager: ObservableObject {
     private var network: Network
     private var syncSource: SyncSource
     private var database: Database
-    private let bdkQueue = DispatchQueue (label: "bdkQueue", qos: .userInitiated)
     private var syncTimer: Timer?
     
     // Public functions
@@ -89,15 +89,15 @@ public class BDKManager: ObservableObject {
         switch self.walletState {
         case .loaded(let wallet):
             self.syncState = SyncState.syncing
-            bdkQueue.async {
+            Task.detached {
                 do {
                     let progress = Progress() // Progress for Esplora/Electrum is not available, but object is required by the wallet.sync function.
                     try wallet.sync(progressUpdate: progress, maxAddressParam: nil)
-                    DispatchQueue.main.async {
+                    await MainActor.run {
                         self.syncState = SyncState.synced
                     }
                 } catch let error {
-                    DispatchQueue.main.async {
+                    await MainActor.run {
                         self.syncState = SyncState.failed(error)
                     }
                 }
