@@ -61,6 +61,17 @@ public class BDKManager: ObservableObject {
         }
     }
     
+    // Recover ExtendedKeyInfo from a recovery phrase
+    public func restoreFromMnemonic(mnemonic: String, password: String?) -> ExtendedKeyInfo? {
+        do {
+            let extendedKeyInfo = try restoreExtendedKey(network: self.network, mnemonic: mnemonic, password: password)
+            return extendedKeyInfo
+        } catch let error {
+            print(error)
+            return nil
+        }
+    }
+    
     // Create a descriptor from an extended key, .singleKey_wpkh84 is the only type currently defined
     public func createDescriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String {
         switch descriptorType {
