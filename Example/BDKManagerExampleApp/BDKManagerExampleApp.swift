@@ -25,7 +25,7 @@ struct BDKManagerExampleApp: App {
         do {
             let wordCount = WordCount.words12 // 12, 24
             let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil)
-            let descriptor = bdkManager.createDescriptor(descriptorType: DescriptorType.singleKey_wpkh84, extendedKeyInfo: extendedKeyInfo)
+            let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
             bdkManager.loadWallet(descriptor: descriptor)
         } catch let error {
             print(error)

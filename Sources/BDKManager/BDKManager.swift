@@ -62,10 +62,10 @@ public class BDKManager: ObservableObject {
     }
     
     // Create a descriptor from an extended key, .singleKey_wpkh84 is the only type currently defined
-    public func createDescriptor(descriptorType: DescriptorType, extendedKeyInfo: ExtendedKeyInfo) -> String {
+    public func createDescriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String {
         switch descriptorType {
         case .singleKey_wpkh84:
-            return ("wpkh(" + extendedKeyInfo.xprv + "/84'/1'/0'/0/*)")
+            return ("wpkh(" + xprv + "/84'/1'/0'/0/*)")
         }
     }
     

@@ -33,7 +33,7 @@ To create a new extended private key, descriptor and load the wallet:
 do {
     let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: nil, password: nil) // optional password and wordCount (defaults to 12)
     let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 is the only type defined so far
-    let descriptor = bdkManager.createDescriptor(descriptorType: descriptorType, extendedKeyInfo: extendedKeyInfo)
+    let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
     bdkManager.loadWallet(descriptor: descriptor)
 } catch let error {
     print(error)
@@ -84,7 +84,7 @@ struct WalletApp: App {
         // Load a singlekey wallet from a newly generated private key
         do {
             let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: nil, password: nil)
-            let descriptor = bdkManager.createDescriptor(descriptorType: DescriptorType.singleKey_wpkh84, extendedKeyInfo: extendedKeyInfo)
+            let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
             bdkManager.loadWallet(descriptor: descriptor)
         } catch let error {
             print(error)
@@ -140,7 +140,7 @@ BDK Manager has the following public functions:
 ```swift
 init(network: Network, syncSource: SyncSource, database: Database)
 generateExtendedKey(wordCount: WordCount?, password: String?) throws -> ExtendedKeyInfo
-createDescriptor(descriptorType: DescriptorType, extendedKeyInfo: ExtendedKeyInfo) -> String
+createDescriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String
 loadWallet(descriptor: String)
 sync()
 startSyncRegularly(interval: TimeInterval)
