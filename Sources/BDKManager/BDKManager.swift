@@ -62,7 +62,7 @@ public class BDKManager: ObservableObject {
     }
     
     // Recover ExtendedKeyInfo from a recovery phrase
-    public func restoreFromMnemonic(mnemonic: String, password: String?) -> ExtendedKeyInfo? {
+    public func restoreFromMnemonic(mnemonic: String, password: String?) throws -> ExtendedKeyInfo? {
         do {
             let extendedKeyInfo = try restoreExtendedKey(network: self.network, mnemonic: mnemonic, password: password)
             return extendedKeyInfo
