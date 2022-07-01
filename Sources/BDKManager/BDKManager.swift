@@ -76,6 +76,8 @@ public class BDKManager: ObservableObject {
         switch descriptorType {
         case .singleKey_wpkh84:
             return ("wpkh(" + xprv + "/84'/1'/0'/0/*)")
+        case .singleKey_tr86:
+            return ("tr(" + xprv + "/86'/1'/0'/0/*)")
         }
     }
     
@@ -242,7 +244,8 @@ public typealias AddressIndex = BitcoinDevKit.AddressIndex
 public typealias AddressInfo = BitcoinDevKit.AddressInfo
 
 public enum DescriptorType {
-    case singleKey_wpkh84
+    case singleKey_wpkh84 // Native Segwit
+    case singleKey_tr86 // Taproot
 }
 
 public struct SyncSource {
