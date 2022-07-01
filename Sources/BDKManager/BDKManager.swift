@@ -238,6 +238,8 @@ public typealias Progress = BitcoinDevKit.Progress
 public typealias Transaction = BitcoinDevKit.Transaction
 public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias WordCount = BitcoinDevKit.WordCount
+public typealias AddressIndex = BitcoinDevKit.AddressIndex
+public typealias AddressInfo = BitcoinDevKit.AddressInfo
 
 public enum DescriptorType {
     case singleKey_wpkh84
