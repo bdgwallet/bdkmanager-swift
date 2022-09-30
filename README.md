@@ -32,7 +32,7 @@ To create a new extended private key, descriptor and load the wallet:
 ```swift
 do {
     let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: nil, password: nil) // optional password and wordCount (defaults to 12)
-    let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 is the only type defined so far
+    let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 for Native Segwit, and .singleKey_tr86 for Taproot
     let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
     bdkManager.loadWallet(descriptor: descriptor)
 } catch let error {
