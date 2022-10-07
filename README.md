@@ -27,7 +27,7 @@ bdkManager = BDKManager.init(network: network, syncSource: syncSource, database:
 
 ## Load wallet
 
-To create a new extended private key, descriptor and load the wallet:
+To create a new mnemonic, descriptor and load the wallet:
 
 ```swift
 do {    
