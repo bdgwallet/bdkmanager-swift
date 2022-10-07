@@ -30,10 +30,14 @@ bdkManager = BDKManager.init(network: network, syncSource: syncSource, database:
 To create a new extended private key, descriptor and load the wallet:
 
 ```swift
-do {
-    let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: nil, password: nil) // optional password and wordCount (defaults to 12)
-    let descriptorType = DescriptorType.singleKey_wpkh84 // .singleKey_wpkh84 is the only type defined so far
-    let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
+do {    
+    let wordCount = WordCount.words12 // .words12, .words24
+    let mnemonic = generateMnemonic(wordCount: wordCount)
+    let descriptorType = DescriptorType.singleKey_tr86 // .singleKey_tr86, .singleKey_wpkh84
+    let descriptor = bdkManager.descriptorFromMnemonic(
+        descriptorType: descriptorType,
+        mnemonic: mnemonic,
+        password: nil) // optional password
     bdkManager.loadWallet(descriptor: descriptor)
 } catch let error {
     print(error)
@@ -55,7 +59,7 @@ On every sync, the @Published parameters `.balance` and `.transactions` are upda
 ```swift
 bdkManager.sync() // Will sync once
 
-bdkManager.startSyncRegularly(interval: 120) // Will sync every 120 seconds
+bdkManager.startSyncRegularly(interval: 120) // Will sync immediately, then every 120 seconds
 bdkManager.stopSyncRegularly() // Will stop the regular sync
 ```
 
@@ -83,8 +87,13 @@ struct WalletApp: App {
         
         // Load a singlekey wallet from a newly generated private key
         do {
-            let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: nil, password: nil)
-            let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
+            let wordCount = WordCount.words12 // .words12, .words24
+            let mnemonic = generateMnemonic(wordCount: wordCount)
+            let descriptorType = DescriptorType.singleKey_tr86 // .singleKey_tr86, .singleKey_wpkh84
+            let descriptor = bdkManager.descriptorFromMnemonic(
+                descriptorType: descriptorType,
+                mnemonic: mnemonic,
+                password: nil) // optional password
             bdkManager.loadWallet(descriptor: descriptor)
         } catch let error {
             print(error)
@@ -117,16 +126,16 @@ struct WalletView: View {
             Text("Hello, wallet!")
             switch bdkManager.syncState {
             case .synced:
-                Text("Balance: \(bdkManager.balance)")
+                Text("Balance: \(bdkManager.balance.total.description)")
             case .syncing:
                 Text("Balance: Syncing")
             default:
                 Text("Balance: Not synced")
             }
-            Text(bdkManager.wallet?.getNewAddress() ?? "-")
+            Text(bdkManager.wallet?.getAddress(addressIndex: AddressIndex.new) ?? "-")
         }.onAppear {
             bdkManager.sync() // to sync once
-            //bdkManager.startSyncRegularly(interval: 120) // to sync every 120 seconds
+            //bdkManager.startSyncRegularly(interval: 120) // to sync immediately, then every 120 seconds
         }.onDisappear {
             //bdkManager.stopSyncRegularly() // if startSyncRegularly was used
         }
@@ -134,13 +143,24 @@ struct WalletView: View {
 }
 ```
 
+## Public variables
+
+BDK Manager has the following `@Published` public variables, meaning they can be observed and lead to updates in SwiftUI:
+```swift
+.wallet: Wallet?
+.balance: Balance
+.transactions: [TransactionDetails]
+.walletState // .empty, .loading, .loaded, .failed
+.syncState // .empty, .syncing, .synced, .failed
+```
+
 ## Public functions
 
 BDK Manager has the following public functions:
 ```swift
 init(network: Network, syncSource: SyncSource, database: Database)
-generateExtendedKey(wordCount: WordCount?, password: String?) throws -> ExtendedKeyInfo
-createDescriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String
+descriptorFromMnemonic(descriptorType: DescriptorType, mnemonic: String, password: String?) -> String?
+descriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String
 loadWallet(descriptor: String)
 sync()
 startSyncRegularly(interval: TimeInterval)
@@ -150,22 +170,11 @@ sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction?
 
 Since the wallet is a BDK Wallet, the corresponding functions are also available on .wallet:
 ```swift
-getNewAddress()  -> String
+getAddress(addressIndex: AddressIndex) -> String
 getLastUnusedAddress()  -> String
-getBalance() throws -> UInt64
+getBalance() throws -> Balance
 sign( psbt: PartiallySignedBitcoinTransaction ) throws
 getTransactions() throws -> [Transaction]
 getNetwork()  -> Network
 broadcast( psbt: PartiallySignedBitcoinTransaction ) throws -> Transaction
-```
-
-## Public variables
-
-BDK Manager has the following `@Published` public variables, meaning they can be observed and lead to updates in SwiftUI:
-```swift
-.wallet: Wallet?
-.balance: UInt64
-.transactions: [BitcoinDevKit.Transaction]
-.walletState // .empty, .loading, .loaded, .failed
-.syncState // .empty, .syncing, .synced, .failed
 ```

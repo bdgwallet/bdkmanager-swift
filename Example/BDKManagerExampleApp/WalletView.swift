@@ -16,13 +16,13 @@ struct WalletView: View {
             Text("Hello, wallet!")
             switch bdkManager.syncState {
             case .synced:
-                Text("Balance: \(bdkManager.balance)")
+                Text("Balance: \(bdkManager.balance.total.description)")
             case .syncing:
                 Text("Balance: Syncing")
             default:
                 Text("Balance: Not synced")
             }
-            Text(bdkManager.wallet?.getNewAddress() ?? "-")
+            Text(bdkManager.wallet?.getAddress(addressIndex: AddressIndex.new) ?? "-")
         }.onAppear {
             bdkManager.sync() // to sync once
             //bdkManager.startSyncRegularly(interval: 120) // to sync every 120 seconds
