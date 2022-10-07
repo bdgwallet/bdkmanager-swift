@@ -55,12 +55,16 @@ public class BDKManager: ObservableObject {
     // Create a descriptor from a mnemonic
     public func descriptorFromMnemonic(descriptorType: DescriptorType, mnemonic: String, password: String?) -> String? {
         do {
-            let descriptorSecretKey = try DescriptorSecretKey(network: self.network, mnemonic: mnemonic, password: password ?? nil)
+            let rootKey = try DescriptorSecretKey(network: self.network, mnemonic: mnemonic, password: password ?? nil)
             switch descriptorType {
             case .singleKey_wpkh84:
-                return ("wpkh(" + descriptorSecretKey.asString() + "/84'/1'/0'/0/*)")
+                let path = try DerivationPath(path: "m/84h/1h/0h/0")
+                let descriptorSecretKey = try rootKey.derive(path: path)
+                return ("wpkh(" + descriptorSecretKey.asString() + ")")
             case .singleKey_tr86:
-                return ("tr(" + descriptorSecretKey.asString() + "/86'/1'/0'/0/*)")
+                let path = try DerivationPath(path: "m/86'/1'/0'/0")
+                let descriptorSecretKey = try rootKey.derive(path: path)
+                return ("tr(" + descriptorSecretKey.asString() + ")")
             }
         } catch let error {
             print(error)
