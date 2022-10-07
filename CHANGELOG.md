@@ -2,6 +2,10 @@
 
 An attempt to document breaking or major API changes will be made here.
 
+## 0.9.1
+
+Fix a bug with how descriptor was derived from mnemonic, changes bdk-ffi 0.9.0 that was missed in previous update
+                    
 ## 0.9.0
 
 Update to [bdk-ffi 0.9.0](https://github.com/bitcoindevkit/bdk-ffi/blob/master/CHANGELOG.md) requiring changes to the way new wallets are generated as well as other API changes.
