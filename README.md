@@ -165,7 +165,7 @@ loadWallet(descriptor: String)
 sync()
 startSyncRegularly(interval: TimeInterval)
 stopSyncRegularly()
-sendBitcoin(recipient: String, amount: UInt64, feeRate: Float?) -> Transaction?
+sendBitcoin(recipient: String, amount: UInt64, feeRate: Float) -> Bool
 ```
 
 Since the wallet is a BDK Wallet, the corresponding functions are also available on .wallet:
