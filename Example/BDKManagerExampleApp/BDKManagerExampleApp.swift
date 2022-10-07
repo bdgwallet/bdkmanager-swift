@@ -14,18 +14,22 @@ struct BDKManagerExampleApp: App {
     
     init() {
         // Define BDKManager init options
-        let network = Network.testnet // set bitcoin, testnet, signet or regtest
-        let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // set esplora or electrum, can take customUrl
-        let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // set memory or disk, optional path and tree parameters
+        let network = Network.testnet // .bitcoin, .testnet, .signet or .regtest
+        let syncSource = SyncSource(type: SyncSourceType.esplora, customUrl: nil) // .esplora or .electrum, can take customUrl
+        let database = Database(type: DatabaseType.memory, path: nil, treeName: nil) // .memory or .disk, optional path and tree parameters
         
         // Initialize a BDKManager instance
         bdkManager = BDKManager.init(network: network, syncSource: syncSource, database: database)
         
-        // Load a singlekey wallet from a newly generated private key
+        // Load a singlekey wallet from a newly generated mnemonic
         do {
-            let wordCount = WordCount.words12 // 12, 24
-            let extendedKeyInfo = try bdkManager.generateExtendedKey(wordCount: wordCount, password: nil)
-            let descriptor = bdkManager.createDescriptorFromXprv(descriptorType: DescriptorType.singleKey_wpkh84, xprv: extendedKeyInfo.xprv)
+            let wordCount = WordCount.words12 // .words12, .words24
+            let mnemonic = generateMnemonic(wordCount: wordCount)
+            let descriptorType = DescriptorType.singleKey_tr86 // .singleKey_tr86, .singleKey_wpkh84
+            let descriptor = bdkManager.descriptorFromMnemonic(
+                descriptorType: descriptorType,
+                mnemonic: mnemonic,
+                password: nil)
             bdkManager.loadWallet(descriptor: descriptor)
         } catch let error {
             print(error)
