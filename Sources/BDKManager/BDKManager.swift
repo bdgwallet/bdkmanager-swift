@@ -10,8 +10,8 @@ import BitcoinDevKit
 public class BDKManager: ObservableObject {
     // Public variables
     @Published public var wallet: Wallet?
-    @Published public var balance: UInt64 = 0
-    @Published public var transactions: [BitcoinDevKit.Transaction] = []
+    @Published public var balance: Balance = Balance(immature: 0, trustedPending: 0, untrustedPending: 0, confirmed: 0, spendable: 0, total: 0)
+    @Published public var transactions: [BitcoinDevKit.TransactionDetails] = []
     @Published public var walletState = WalletState.empty {
         didSet {
             switch walletState {
@@ -52,27 +52,24 @@ public class BDKManager: ObservableObject {
     private var syncTimer: Timer?
     
     // Public functions
-    // Generate an extended key
-    public func generateExtendedKey(wordCount: WordCount?, password: String?) throws -> ExtendedKeyInfo {
+    // Create a descriptor from a mnemonic
+    public func descriptorFromMnemonic(descriptorType: DescriptorType, mnemonic: String, password: String?) -> String? {
         do {
-            return try BitcoinDevKit.generateExtendedKey(network: self.network, wordCount: wordCount != nil ? wordCount! : WordCount.words12, password: password)
+            let descriptorSecretKey = try DescriptorSecretKey(network: self.network, mnemonic: mnemonic, password: password ?? nil)
+            switch descriptorType {
+            case .singleKey_wpkh84:
+                return ("wpkh(" + descriptorSecretKey.asString() + "/84'/1'/0'/0/*)")
+            case .singleKey_tr86:
+                return ("tr(" + descriptorSecretKey.asString() + "/86'/1'/0'/0/*)")
+            }
         } catch let error {
-            throw error
+            print(error)
         }
+        return nil
     }
     
-    // Recover ExtendedKeyInfo from a recovery phrase
-    public func restoreFromMnemonic(mnemonic: String, password: String?) throws -> ExtendedKeyInfo {
-        do {
-            let extendedKeyInfo = try restoreExtendedKey(network: self.network, mnemonic: mnemonic, password: password)
-            return extendedKeyInfo
-        } catch let error {
-            throw error
-        }
-    }
-    
-    // Create a descriptor from an extended key, .singleKey_wpkh84 is the only type currently defined
-    public func createDescriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String {
+    // Create a descriptor from an extended private key
+    public func descriptorFromXprv(descriptorType: DescriptorType, xprv: String) -> String {
         switch descriptorType {
         case .singleKey_wpkh84:
             return ("wpkh(" + xprv + "/84'/1'/0'/0/*)")
@@ -138,11 +135,11 @@ public class BDKManager: ObservableObject {
         if self.wallet != nil {
             do {
                 let psbt = try TxBuilder().addRecipient(address: recipient, amount: amount).feeRate(satPerVbyte: feeRate).finish(wallet: self.wallet!)
-                try self.wallet!.sign(psbt: psbt)
+                let success = try self.wallet!.sign(psbt: psbt)
                 let blockchainConfig = self.blockchainConfig(network: self.network, syncSource: self.syncSource)
                 let blockchain = try Blockchain(config: blockchainConfig)
                 try blockchain.broadcast(psbt: psbt)
-                return true
+                return success
             } catch let error {
                 print(error)
                 return false
@@ -200,7 +197,7 @@ public class BDKManager: ObservableObject {
     private func getBalance() {
         do {
             self.balance = try self.wallet!.getBalance()
-            print("Balance is: " + self.balance.description)
+            print("Balance is: " + self.balance.total.description)
         } catch let error {
             print("Error getting wallet balance: " + error.localizedDescription)
         }
@@ -209,22 +206,8 @@ public class BDKManager: ObservableObject {
     // Update .transactions
     private func getTransactions() {
         do {
-            let transactions = try self.wallet!.getTransactions()
-            self.transactions = transactions.sorted(by: {
-                switch $0 {
-                case .confirmed(_, let confirmation_a):
-                    switch $1 {
-                    case .confirmed(_, let confirmation_b): return confirmation_a.timestamp > confirmation_b.timestamp
-                    default: return false
-                    }
-                default:
-                    switch $1 {
-                    case .unconfirmed(_):
-                        return true
-                    default: return false
-                    }
-                }
-            })
+            let transactions = try self.wallet!.listTransactions()
+            self.transactions = transactions
             print("Transaction count: " + self.transactions.count.description)
         } catch let error {
             print("Error getting transactions: " + error.localizedDescription)
@@ -233,11 +216,9 @@ public class BDKManager: ObservableObject {
 }
 
 // Helpers
-public typealias ExtendedKeyInfo = BitcoinDevKit.ExtendedKeyInfo
 public typealias Network = BitcoinDevKit.Network
 public typealias PartiallySignedBitcoinTransaction = BitcoinDevKit.PartiallySignedBitcoinTransaction
 public typealias Progress = BitcoinDevKit.Progress
-public typealias Transaction = BitcoinDevKit.Transaction
 public typealias TransactionDetails = BitcoinDevKit.TransactionDetails
 public typealias WordCount = BitcoinDevKit.WordCount
 public typealias AddressIndex = BitcoinDevKit.AddressIndex
