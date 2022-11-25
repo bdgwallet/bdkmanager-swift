@@ -180,9 +180,8 @@ public class BDKManager: ObservableObject {
             databaseConfig = DatabaseConfig.memory
         case .disk:
             let path = database.path != nil ? database.path : ""
-            let treeName = database.treeName != nil ? database.treeName : ""
-            let sledDbConfig = SledDbConfiguration(path: path!, treeName: treeName!)
-            databaseConfig = DatabaseConfig.sled(config: sledDbConfig)
+            let sqlLiteDbConfig = SqliteDbConfiguration(path: path!)
+            databaseConfig = DatabaseConfig.sqlite(config: sqlLiteDbConfig)
         }
         return databaseConfig
     }
